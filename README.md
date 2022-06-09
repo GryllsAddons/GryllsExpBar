@@ -23,5 +23,5 @@ Class colour experince bar option<br>
 /geb reset - reset bar to default settings<br>
 
 ### Preview:<br>
-<img src="[http://url/image.png](https://github.com/GryllsAddons/AddonPreviews/blob/main/GryllsExpBar/GEB1.png)" >
-<img src="[http://url/image.png](https://github.com/GryllsAddons/AddonPreviews/blob/main/GryllsExpBar/GEB2.png)" >
+![1](https://raw.githubusercontent.com/GryllsAddons/AddonPreviews/main/GryllsExpBar/GEB1.png)
+![2](https://raw.githubusercontent.com/GryllsAddons/AddonPreviews/main/GryllsExpBar/GEB2.png)
