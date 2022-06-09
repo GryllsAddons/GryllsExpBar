@@ -309,12 +309,12 @@ local function GryllsExpBar_commands(msg, editbox)
         DEFAULT_CHAT_FRAME:AddMessage("|c"..orange.."Grylls|rExpBar: exp bar has been reset")
     else
         DEFAULT_CHAT_FRAME:AddMessage("|c"..orange.."Grylls|rExpBar usage:")
-        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb move |r - toggles allowing moving of the bar by dragging it")   
+        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb move |r - toggle allowing moving of the bar by dragging it")   
         DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb width n|r - set bar to width n")
         DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb height n|r - set bar to height n")
         DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb border |r - toggle bar border")
         DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb dark |r - toggle dark theme border")
-        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb class |r - toggles class coloring of exp bar")  
+        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb class |r - toggle class coloring of exp bar")  
         DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb reset |r - reset bar to default settings")             
     end
 end
