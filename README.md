@@ -6,8 +6,12 @@ Experience and Reputation Bar for World of Warcraft: Vanilla
 
 ### Description:<br>
 This addon adds a simple Blizz like configurable experience and reputation bar<br>
-Mousing over the bar will show experience or watched reputation details<br>
 The addon settings will save per character<br>
+
+### Features:<br>
+Mousing over the bar will show experience or watched reputation details<br>
+Dark mode option<br>
+Class colour experince bar option<br>
 
 ### Usage:<br>
 /geb move - toggles allowing moving of the bar by dragging it<br>
@@ -15,4 +19,5 @@ The addon settings will save per character<br>
 /geb height n - set bar to height n<br>
 /geb border - toggle bar border<br>
 /geb dark - toggle dark theme border<br>
+/geb class - toggles class coloring of exp bar<br>
 /geb reset - reset bar to default settings<br>
