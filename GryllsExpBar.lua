@@ -113,7 +113,9 @@ local function createBar()
     end)    
 
     GryllsExpBar.mouse:SetScript("OnDragStart", function()
-        GryllsExpBar.backgroundBar:StartMoving()
+        if GryllsExpBar.move then
+            GryllsExpBar.backgroundBar:StartMoving()
+        end
     end)
     
     GryllsExpBar.mouse:SetScript("OnDragStop", function()
@@ -367,16 +369,26 @@ local function GryllsExpBar_commands(msg, editbox)
             DEFAULT_CHAT_FRAME:AddMessage("|c"..orange.."Grylls|rExpBar: dark theme on")
         end
         barBorder()
+    elseif msg == "move" then
+        if GryllsExpBar.move then
+            GryllsExpBar.move = false
+            DEFAULT_CHAT_FRAME:AddMessage("|c"..orange.."Grylls|rExpBar: bar locked")
+        else
+            GryllsExpBar.move = true
+            DEFAULT_CHAT_FRAME:AddMessage("|c"..orange.."Grylls|rExpBar: bar unlocked")
+        end
+        barBorder()
     elseif msg == "reset" then
         resetBar()
         DEFAULT_CHAT_FRAME:AddMessage("|c"..orange.."Grylls|rExpBar: exp bar has been reset")
     else
         DEFAULT_CHAT_FRAME:AddMessage("|c"..orange.."Grylls|rExpBar usage:")
-        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb width n|r - set exp bar to width n")
-        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb height n|r - set exp bar to height n")
-        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb border |r - toggle exp bar border")
+        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb width n|r - set bar to width n")
+        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb height n|r - set bar to height n")
+        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb border |r - toggle bar border")
         DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb dark |r - toggle dark theme border")
-        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb reset |r - reset exp bar to default settings")
+        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb reset |r - reset bar to default settings")
+        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb move |r - toggles allowing moving of the bar by dragging it")        
     end
 end
 
@@ -395,6 +407,7 @@ GryllsExpBar:SetScript("OnEvent", function()
             setBar()
 
 			DEFAULT_CHAT_FRAME:AddMessage("|cffff8000Grylls|rGryllsExpBar loaded! /geb")
+            GryllsExpBar.move = false
             GryllsExpBar.loaded = true
 		end
     elseif event == "PLAYER_ENTERING_WORLD" then
