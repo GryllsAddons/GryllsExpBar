@@ -5,7 +5,7 @@ Experience and Reputation Bar for World of Warcraft: Vanilla
 /geb or /gryllsexpbar
 
 ### Description:<br>
-This addon adds a simple Blizz like configurable experience and reputation bar<br>
+This addon adds a simple configurable experience and reputation bar<br>
 The addon settings will save per character<br>
 
 ### Features:<br>
