@@ -8,6 +8,7 @@ GryllsExpBar_Settings = {
     barTop = 200,
     barBorder = true,
     darkTheme = false,
+    classColor = false,
 }
 
 -- credit to Shagu (https://shagu.org/pfUI/) for code below
@@ -159,106 +160,22 @@ local function updateExp()
     end
 
     -- set color of bars
-    local _, class = UnitClass("player")
-    local color = RAID_CLASS_COLORS[class]
-    GryllsExpBar.expBar:SetStatusBarColor(color.r, color.g, color.b, 1)
-    GryllsExpBar.restedBar:SetStatusBarColor(color.r, color.g, color.b, 0.75) -- set alpha of rested bar
-    --GryllsExpBar.string.expText:SetTextColor(color.r, color.g, color.b, 1)       
+    local r,g,b = 0, 0.5, 1
+
+    if GryllsExpBar_Settings.classColor then
+        local _, class = UnitClass("player")
+        local color = RAID_CLASS_COLORS[class]
+        r,g,b = color.r, color.g, color.b
+    end 
+    
+    GryllsExpBar.expBar:SetStatusBarColor(r,g,b,1)
+    GryllsExpBar.restedBar:SetStatusBarColor(r,g,b,0.5) -- set alpha of rested bar
 
     -- set exp text       
     GryllsExpBar.string.expText:SetText(ExpText(xp, xpmax, exh, xp_perc, remaining, remaining_perc, playerlevel))
 end
 
 local function updateRep()
-    local function shortRep(name)
-        -- returns short names for reputation factions
-        -- http://vanilla-wow.wikia.com/wiki/Reputation
-
-        -- Alliance
-        if name == "Darnassus" then
-            return "Darnassus"
-        elseif name == "Gnomeregan Exiles" then
-            return "Gnomeregan"    
-        elseif name == "Ironforge" then
-            return "Ironforge"
-        elseif name == "Stormwind" then
-            return "Stormwind"
-        -- Horde
-        elseif name == "Darkspear Trolls" then
-            return "Darkspear"
-        elseif name == "Orgrimmar" then
-            return "Orgrimmar"
-        elseif name == "Thunder Bluff" then
-            return "T. Bluff"
-        elseif name == "Undercity" then
-            return "Undercity"
-        -- Alliance PVP
-        elseif name == "League of Arathor" then
-            return "Arathor"
-        elseif name == "Silverwing Sentinels" then
-            return "Silverwing"
-        elseif name == "Stormpike Guard" then
-            return "Stormpike"
-        -- Horde PvP
-        elseif name == "Defilers" then
-            return "Defilers"
-        elseif name == "Frostwolf Clan" then
-            return "Frostwolf"
-        elseif name == "Warsong Outriders" then
-            return "Warsong"
-        -- Steamwheedle Cartel
-        elseif name == "Booty Bay" then
-            return "Booty"
-        elseif name == "Everlook" then
-            return "Everlook"
-        elseif name == "Gadgetzan" then
-            return "Gadgetzan"
-        elseif name == "Ratchet" then
-            return "Ratchet"
-        -- Raid Factions
-        elseif name == "Brood of Nozdormu" then
-            return "Nozdormu"
-        elseif name == "Cenarion Circle" then
-            return "Cenarion"
-        elseif name == "Hydraxian Waterlords" then
-            return "Hydraxian"
-        elseif name == "Zandalar Tribe" then
-            return "Zandalar"
-        -- Other
-        elseif name == "Argent Dawn" then
-            return "Argent"
-        elseif name == "Bloodsail Buccaneers" then
-            return "Bloodsail"
-        elseif name == "Darkmoon Faire" then
-            return "Darkmoon"
-        elseif name == "Gelkis Clan Centaur" then
-            return "Gelkis"
-        elseif name == "Magram Clan Centaur" then
-            return "Magram"
-        elseif name == "Ravenholdt" then
-            return "Ravenholdt"
-        elseif name == "Shen'dralar" then
-            return "Shen'dralar"
-        elseif name == "Syndicate" then
-            return "Syndicate"
-        elseif name == "Thorium Brotherhood" then
-            return "Thorium"
-        elseif name == "Timbermaw Hold" then
-            return "Timbermaw"
-        elseif name == "Wintersaber Trainers" then
-            return "Wintersaber"
-        -- Removed
-        elseif name == "Revantusk Tribe" then
-            return "Revantusk"
-        elseif name == "Wildhammer Clan" then
-            return "Wildhammer"
-        elseif name == "Silvermoon Remnant" then
-            return "Silvermoon"
-        elseif name == "Theramore" then
-            return "Theramore"
-        end
-    end
-
     local name, standing, min, max, value = GetWatchedFactionInfo()
     local max = max - min
     local value = value - min
@@ -278,13 +195,12 @@ local function updateRep()
         GryllsExpBar.repBar:SetValue(value)
 
         -- set rep text
-        GryllsExpBar.string.repText:SetText(shortRep(name) .. " (" .. repvalues[standing] .. ") " .. percentFloor .. "% - "  .. roundnum(remaining) .. " remaining")
+        GryllsExpBar.string.repText:SetText(name .. " (" .. repvalues[standing] .. ") " .. percentFloor .. "% - "  .. roundnum(remaining) .. " remaining")
         
         -- set rep colors
         local r = FACTION_BAR_COLORS[standing].r;
         local g = FACTION_BAR_COLORS[standing].g;
         local b = FACTION_BAR_COLORS[standing].b;
-        --GryllsExpBar.string.repText:SetTextColor(r,g,b,1)
         GryllsExpBar.repBar:SetStatusBarColor(r,g,b,1)
         --GryllsExpBar.string.repText:Show()
     else 
@@ -323,6 +239,7 @@ local function resetBar()
     GryllsExpBar_Settings.barTop = 200
     GryllsExpBar_Settings.barBorder = true
     GryllsExpBar_Settings.darkTheme = false
+    GryllsExpBar_Settings.classColor = false
     setBar()
 end
 
@@ -378,6 +295,15 @@ local function GryllsExpBar_commands(msg, editbox)
             DEFAULT_CHAT_FRAME:AddMessage("|c"..orange.."Grylls|rExpBar: bar unlocked")
         end
         barBorder()
+    elseif msg == "class" then
+        if GryllsExpBar_Settings.classColor then
+            GryllsExpBar_Settings.classColor = false
+            DEFAULT_CHAT_FRAME:AddMessage("|c"..orange.."Grylls|rExpBar: class coloring off")
+        else
+            GryllsExpBar_Settings.classColor = true
+            DEFAULT_CHAT_FRAME:AddMessage("|c"..orange.."Grylls|rExpBar: class coloring on")
+        end
+        updateExp()
     elseif msg == "reset" then
         resetBar()
         DEFAULT_CHAT_FRAME:AddMessage("|c"..orange.."Grylls|rExpBar: exp bar has been reset")
@@ -388,6 +314,7 @@ local function GryllsExpBar_commands(msg, editbox)
         DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb height n|r - set bar to height n")
         DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb border |r - toggle bar border")
         DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb dark |r - toggle dark theme border")
+        DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb class |r - toggles class coloring of exp bar")  
         DEFAULT_CHAT_FRAME:AddMessage("|c"..yellow.."/geb reset |r - reset bar to default settings")             
     end
 end
