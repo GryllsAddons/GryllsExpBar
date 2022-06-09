@@ -1,0 +1,8 @@
+## Interface: 11200
+## Title: |cffff8000Grylls|rExpBar
+## Author: Grylls
+## Notes: Experience & Reputation Bar
+## Version: 2
+## SavedVariablesPerCharacter: GryllsExpBar_Settings
+
+GryllsExpBar.lua
