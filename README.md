@@ -6,6 +6,7 @@ Experience and Reputation Bar for World of Warcraft: Vanilla
 
 ### Description:<br>
 This addon adds a simple Blizz like configurable experience and reputation bar<br>
+Mousing over the bar will show experience or watched reputation details<br>
 The addon settings will save per character<br>
 
 ### Usage:<br>
