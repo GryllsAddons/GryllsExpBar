@@ -11,7 +11,7 @@ The addon settings will save per character<br>
 ### Features:
 - Mousing over the bar will show experience or watched reputation details
 - Dark mode option
-- Class colour experince bar option
+- Class colour experience bar option
 
 ### Usage:
 /geb move - toggle allowing moving of the bar by dragging it<br>
