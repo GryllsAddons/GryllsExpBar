@@ -23,6 +23,7 @@ The addon settings will save per character<br>
 /geb reset - reset bar to default settings<br>
 
 ### Preview:
-<img src="https://raw.githubusercontent.com/GryllsAddons/AddonPreviews/main/GryllsExpBar/GEB1.png" width=50% height=50%/>
+<img src="https://raw.githubusercontent.com/GryllsAddons/AddonPreviews/main/GryllsExpBar/GEB4.png" width=50% height=50%/>
 <img src="https://raw.githubusercontent.com/GryllsAddons/AddonPreviews/main/GryllsExpBar/GEB2.png" width=50% height=50%/>
+<img src="https://raw.githubusercontent.com/GryllsAddons/AddonPreviews/main/GryllsExpBar/GEB1.png" width=50% height=50%/>
 <img src="https://raw.githubusercontent.com/GryllsAddons/AddonPreviews/main/GryllsExpBar/GEB3.png" width=50% height=50%/>
