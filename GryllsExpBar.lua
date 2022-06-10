@@ -73,21 +73,20 @@ local function createBar()
     )        
     GryllsExpBar.border:SetBackdropBorderColor(1, 1, 1, 1)
     GryllsExpBar.border:SetBackdropColor(1,1,1,0)
-
     GryllsExpBar.string = CreateFrame("Frame", nil, GryllsExpBar.backgroundBar)
-    GryllsExpBar.string:SetAllPoints(GryllsExpBar.backgroundBar)
+    GryllsExpBar.string:SetAllPoints(GryllsExpBar.backgroundBar)    
     GryllsExpBar.string:SetFrameStrata("BACKGROUND")
     GryllsExpBar.string:SetFrameLevel(5)
 
     local font, size, outline = "Fonts\\frizqt__.TTF", 12, "OUTLINE"    
     GryllsExpBar.string.expText = GryllsExpBar.string:CreateFontString(nil, "OVERLAY", "GameFontWhite")
     GryllsExpBar.string.expText:SetFont(font, size, outline)
-    GryllsExpBar.string.expText:SetPoint("CENTER", GryllsExpBar.string, "CENTER", 0, 1)
+    GryllsExpBar.string.expText:SetPoint("CENTER", GryllsExpBar.string, "CENTER", 0, 1)    
     GryllsExpBar.string.expText:Hide()
 
     GryllsExpBar.string.repText = GryllsExpBar.string:CreateFontString(nil, "OVERLAY", "GameFontWhite")
     GryllsExpBar.string.repText:SetFont(font, size, outline)
-    GryllsExpBar.string.repText:SetAllPoints(GryllsExpBar.string.expText)
+    GryllsExpBar.string.repText:SetAllPoints(GryllsExpBar.string.expText)    
     GryllsExpBar.string.repText:Hide()
 
     GryllsExpBar.mouse = CreateFrame("Frame", nil, GryllsExpBar.backgroundBar)
@@ -160,16 +159,21 @@ local function updateExp()
     end
 
     -- set color of bars
-    local r,g,b = 0, 0.5, 1
-
+    local r,g,b
     if GryllsExpBar_Settings.classColor then
         local _, class = UnitClass("player")
         local color = RAID_CLASS_COLORS[class]
         r,g,b = color.r, color.g, color.b
+    else
+        if exh > 0 then -- if rested
+            r,g,b = 0, 0.5, 1
+        else
+            r,g,b = 0.6, 0, 0.6
+        end
     end 
     
     GryllsExpBar.expBar:SetStatusBarColor(r,g,b,1)
-    GryllsExpBar.restedBar:SetStatusBarColor(r,g,b,0.5) -- set alpha of rested bar
+    GryllsExpBar.restedBar:SetStatusBarColor(0, 0.5, 1, 0.5)
 
     -- set exp text       
     GryllsExpBar.string.expText:SetText(ExpText(xp, xpmax, exh, xp_perc, remaining, remaining_perc, playerlevel))
@@ -229,6 +233,9 @@ local function setBar()
     GryllsExpBar.backgroundBar:SetWidth(GryllsExpBar_Settings.barWidth)
     GryllsExpBar.backgroundBar:SetHeight(GryllsExpBar_Settings.barHeight)
     GryllsExpBar.backgroundBar:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", GryllsExpBar_Settings.barLeft, GryllsExpBar_Settings.barTop)
+    GryllsExpBar.string:SetWidth(GryllsExpBar_Settings.barWidth)
+    GryllsExpBar.string.expText:SetWidth(GryllsExpBar.string:GetWidth())
+    GryllsExpBar.string.repText:SetWidth(GryllsExpBar.string:GetWidth())
     barBorder()
 end
 
