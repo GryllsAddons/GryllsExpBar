@@ -1,9 +1,6 @@
 # GryllsExpBar
 Experience and Reputation Bar for World of Warcraft: Vanilla
 
-### Command:
-/geb or /gryllsexpbar
-
 ### Description:
 This addon adds a simple configurable experience and reputation bar<br>
 The addon settings will save per character<br>
@@ -14,6 +11,8 @@ The addon settings will save per character<br>
 - Class colour experience bar option
 
 ### Commands:
+/geb or /gryllsexpbar<br>
+<br>
 /geb move - toggle allowing moving of the bar by dragging it<br>
 /geb width n - set bar to width n<br>
 /geb height n - set bar to height n<br>
