@@ -13,7 +13,7 @@ The addon settings will save per character<br>
 - Dark mode option
 - Class colour experience bar option
 
-### Usage:
+### Commands:
 /geb move - toggle allowing moving of the bar by dragging it<br>
 /geb width n - set bar to width n<br>
 /geb height n - set bar to height n<br>
