@@ -329,6 +329,7 @@ end
 GryllsExpBar:RegisterEvent("ADDON_LOADED")
 GryllsExpBar:RegisterEvent("PLAYER_ENTERING_WORLD")
 GryllsExpBar:RegisterEvent("PLAYER_XP_UPDATE")
+GryllsExpBar:RegisterEvent("UPDATE_EXHAUSTION")
 GryllsExpBar:RegisterEvent("UPDATE_FACTION")
 GryllsExpBar:SetScript("OnEvent", function()
 	if event == "ADDON_LOADED" then
@@ -345,7 +346,7 @@ GryllsExpBar:SetScript("OnEvent", function()
     elseif event == "PLAYER_ENTERING_WORLD" then
         updateExp()
         updateRep()
-    elseif event == "PLAYER_XP_UPDATE" then
+    elseif event == "PLAYER_XP_UPDATE" or event == "UPDATE_EXHAUSTION" then
         updateExp()
     elseif event == "UPDATE_FACTION" then
         updateRep()
