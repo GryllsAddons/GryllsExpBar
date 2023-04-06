@@ -1,5 +1,6 @@
 -- GryllsExpBar
 local GryllsExpBar = CreateFrame("Frame", nil, UIParent)
+local mouseover
 
 GryllsExpBar_Settings = {
     barWidth = 465,
@@ -19,6 +20,158 @@ local function roundnum(input, places)
         for i = 1, places do pow = pow * 10 end
         return floor(input * pow + 0.5) / pow
     end
+end
+
+local function updateExp()
+    local playerlevel = UnitLevel("player")
+    -- credit to Shagu (https://shagu.org/pfUI/) for code below
+    local function ExpText(xp, xpmax, exh, xp_perc, remaining, remaining_perc, playerlevel)
+        if playerlevel < 60 then
+            if exh ~= 0 then
+                local exh_perc = roundnum(exh / xpmax * 100) or 0
+                return "Level "..playerlevel.." - "..remaining.." ("..remaining_perc.."%) remaining - "..exh.." ("..exh_perc.."%) rested"
+            else
+                return "Level "..playerlevel.." - "..remaining.." ("..remaining_perc.."%) remaining"
+            end
+        end
+    end
+
+    local xp, xpmax, exh = UnitXP("player"), UnitXPMax("player"), GetXPExhaustion() or 0
+    local xp_perc = roundnum(xp / xpmax * 100)
+    local remaining = xpmax - xp
+    local remaining_perc = roundnum(remaining / xpmax * 100)
+
+    -- set values for expBar
+    GryllsExpBar.expBar:SetMinMaxValues(0, xpmax)
+    GryllsExpBar.expBar:SetValue(xp)
+    -- set values for rested
+    GryllsExpBar.restedBar:SetMinMaxValues(0, xpmax)
+
+    -- as you can rest into the next level...
+    if exh > remaining then
+        GryllsExpBar.restedBar:SetValue(xpmax) -- fill the restedBar as we have rested into the next level
+    else
+        GryllsExpBar.restedBar:SetValue(xp + exh)
+    end
+
+    -- set color of bars
+    local r,g,b
+    if GryllsExpBar_Settings.classColor then
+        local _, class = UnitClass("player")
+        local color = RAID_CLASS_COLORS[class]
+        r,g,b = color.r, color.g, color.b
+    else
+        if exh > 0 then -- if rested
+            r,g,b = 0, 0.5, 1
+        else
+            r,g,b = 0.6, 0, 0.6
+        end
+    end
+
+    GryllsExpBar.expBar:SetStatusBarColor(r,g,b,1)
+    GryllsExpBar.restedBar:SetStatusBarColor(0, 0.5, 1, 0.5)
+
+    -- set exp text
+    if mouseover then
+        GryllsExpBar.string.expText:SetText(ExpText(xp, xpmax, exh, xp_perc, remaining, remaining_perc, playerlevel))
+    else
+        GryllsExpBar.string.expText:SetText(exh .. " (" .. xp_perc .. "%) rested")
+    end
+end
+
+local function updateRep()
+    local name, standing, min, max, value = GetWatchedFactionInfo()
+    local max = max - min
+    local value = value - min
+    local remaining = max - value
+    local percent = (value / max) * 100
+    local percentFloor = floor(percent + 0.5)
+    local repvalues = { "Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted" }
+    local level = UnitLevel("player")
+
+    if name then -- if we are watching a faction
+        GryllsExpBar.repBar:Show()
+        GryllsExpBar.expBar:SetValue(0) -- hide expBar
+        GryllsExpBar.restedBar:SetValue(0) -- hide restedBar
+
+        -- set rep values
+        GryllsExpBar.repBar:SetMinMaxValues(0, max)
+        GryllsExpBar.repBar:SetValue(value)
+
+        -- set rep text
+        GryllsExpBar.string.repText:SetText(name .. " (" .. repvalues[standing] .. ") " .. percentFloor .. "% - "  .. roundnum(remaining) .. " remaining")
+
+        -- set rep colors
+        local r = FACTION_BAR_COLORS[standing].r;
+        local g = FACTION_BAR_COLORS[standing].g;
+        local b = FACTION_BAR_COLORS[standing].b;
+        GryllsExpBar.repBar:SetStatusBarColor(r,g,b,1)
+        --GryllsExpBar.string.repText:Show()
+    else
+        -- not watching a faction
+        GryllsExpBar.repBar:Hide()
+        updateExp(frame)
+        --GryllsExpBar.string.expText:Show()
+    end
+end
+
+local function getRestedPercent()
+    local xp, xpmax, exh = UnitXP("player"), UnitXPMax("player"), GetXPExhaustion() or 0
+    local xp_perc = roundnum(xp / xpmax * 100)
+    return xp_perc
+end
+
+local function updateResting()
+    if GetWatchedFactionInfo() then
+        GryllsExpBar.string.expText:Hide()
+    else
+        if IsResting() then
+            updateExp()
+            GryllsExpBar.string.expText:Show()
+        else
+            -- Always show rested % for Turtle WoW
+            if (TargetHPText or TargetHPPercText) then
+                GryllsExpBar.string.expText:Show()
+            else
+                GryllsExpBar.string.expText:Hide()
+            end
+        end
+    end
+end
+
+local function barBorder()
+    local r,g,b = 1,1,1
+    if GryllsExpBar_Settings.darkTheme == true then
+        r,g,b = 0.3,0.3,0.3
+    end
+    GryllsExpBar.border:SetBackdropBorderColor(r, g, b, 1)
+
+    if GryllsExpBar_Settings.barBorder then
+        GryllsExpBar.border:Show()
+    else
+        GryllsExpBar.border:Hide()
+    end
+end
+
+local function setBar()
+    GryllsExpBar.backgroundBar:SetWidth(GryllsExpBar_Settings.barWidth)
+    GryllsExpBar.backgroundBar:SetHeight(GryllsExpBar_Settings.barHeight)
+    GryllsExpBar.backgroundBar:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", GryllsExpBar_Settings.barLeft, GryllsExpBar_Settings.barTop)
+    GryllsExpBar.string:SetWidth(GryllsExpBar_Settings.barWidth)
+    GryllsExpBar.string.expText:SetWidth(GryllsExpBar.string:GetWidth())
+    GryllsExpBar.string.repText:SetWidth(GryllsExpBar.string:GetWidth())
+    barBorder()
+end
+
+local function resetBar()
+    GryllsExpBar_Settings.barWidth = 465
+    GryllsExpBar_Settings.barHeight = 18
+    GryllsExpBar_Settings.barLeft = 1075
+    GryllsExpBar_Settings.barTop = 200
+    GryllsExpBar_Settings.barBorder = true
+    GryllsExpBar_Settings.darkTheme = false
+    GryllsExpBar_Settings.classColor = false
+    setBar()
 end
 
 local function createBar()
@@ -97,6 +250,8 @@ local function createBar()
     GryllsExpBar.mouse:RegisterForDrag("LeftButton")
 
     GryllsExpBar.mouse:SetScript("OnEnter", function()
+        mouseover = true
+        updateExp()
         local name = GetWatchedFactionInfo()
         if name then
             GryllsExpBar.string.expText:Hide()
@@ -108,8 +263,10 @@ local function createBar()
     end)
 
     GryllsExpBar.mouse:SetScript("OnLeave", function()
+        mouseover = nil
+        updateExp()
         GryllsExpBar.string.repText:Hide()
-        GryllsExpBar.string.expText:Hide()
+        -- GryllsExpBar.string.expText:Hide()
     end)
 
     GryllsExpBar.mouse:SetScript("OnDragStart", function()
@@ -124,130 +281,6 @@ local function createBar()
         GryllsExpBar_Settings.barTop = GryllsExpBar.backgroundBar:GetTop()
         -- DEFAULT_CHAT_FRAME:AddMessage("Grylls|rExpBar: Left = "..GryllsExpBar_Settings.barLeft..", TOP = "..GryllsExpBar_Settings.barTop) -- debug
     end)
-end
-
-local function updateExp()
-    local playerlevel = UnitLevel("player")
-    -- credit to Shagu (https://shagu.org/pfUI/) for code below
-    local function ExpText(xp, xpmax, exh, xp_perc, remaining, remaining_perc, playerlevel)
-        if playerlevel < 60 then
-            if exh ~= 0 then
-                local exh_perc = roundnum(exh / xpmax * 100) or 0
-                return "Level "..playerlevel.." - "..remaining.." ("..remaining_perc.."%) remaining - "..exh.." ("..exh_perc.."%) rested"
-            else
-                return "Level "..playerlevel.." - "..remaining.." ("..remaining_perc.."%) remaining"
-            end
-        end
-    end
-
-    local xp, xpmax, exh = UnitXP("player"), UnitXPMax("player"), GetXPExhaustion() or 0
-    local xp_perc = roundnum(xp / xpmax * 100)
-    local remaining = xpmax - xp
-    local remaining_perc = roundnum(remaining / xpmax * 100)
-
-    -- set values for expBar
-    GryllsExpBar.expBar:SetMinMaxValues(0, xpmax)
-    GryllsExpBar.expBar:SetValue(xp)
-    -- set values for rested
-    GryllsExpBar.restedBar:SetMinMaxValues(0, xpmax)
-
-    -- as you can rest into the next level...
-    if exh > remaining then
-        GryllsExpBar.restedBar:SetValue(xpmax) -- fill the restedBar as we have rested into the next level
-    else
-        GryllsExpBar.restedBar:SetValue(xp + exh)
-    end
-
-    -- set color of bars
-    local r,g,b
-    if GryllsExpBar_Settings.classColor then
-        local _, class = UnitClass("player")
-        local color = RAID_CLASS_COLORS[class]
-        r,g,b = color.r, color.g, color.b
-    else
-        if exh > 0 then -- if rested
-            r,g,b = 0, 0.5, 1
-        else
-            r,g,b = 0.6, 0, 0.6
-        end
-    end
-
-    GryllsExpBar.expBar:SetStatusBarColor(r,g,b,1)
-    GryllsExpBar.restedBar:SetStatusBarColor(0, 0.5, 1, 0.5)
-
-    -- set exp text
-    GryllsExpBar.string.expText:SetText(ExpText(xp, xpmax, exh, xp_perc, remaining, remaining_perc, playerlevel))
-end
-
-local function updateRep()
-    local name, standing, min, max, value = GetWatchedFactionInfo()
-    local max = max - min
-    local value = value - min
-    local remaining = max - value
-    local percent = (value / max) * 100
-    local percentFloor = floor(percent + 0.5)
-    local repvalues = { "Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted" }
-    local level = UnitLevel("player")
-
-    if name then -- if we are watching a faction
-        GryllsExpBar.repBar:Show()
-        GryllsExpBar.expBar:SetValue(0) -- hide expBar
-        GryllsExpBar.restedBar:SetValue(0) -- hide restedBar
-
-        -- set rep values
-        GryllsExpBar.repBar:SetMinMaxValues(0, max)
-        GryllsExpBar.repBar:SetValue(value)
-
-        -- set rep text
-        GryllsExpBar.string.repText:SetText(name .. " (" .. repvalues[standing] .. ") " .. percentFloor .. "% - "  .. roundnum(remaining) .. " remaining")
-
-        -- set rep colors
-        local r = FACTION_BAR_COLORS[standing].r;
-        local g = FACTION_BAR_COLORS[standing].g;
-        local b = FACTION_BAR_COLORS[standing].b;
-        GryllsExpBar.repBar:SetStatusBarColor(r,g,b,1)
-        --GryllsExpBar.string.repText:Show()
-    else
-        -- not watching a faction
-        GryllsExpBar.repBar:Hide()
-        updateExp(frame)
-        --GryllsExpBar.string.expText:Show()
-    end
-end
-
-local function barBorder()
-    local r,g,b = 1,1,1
-    if GryllsExpBar_Settings.darkTheme == true then
-        r,g,b = 0.3,0.3,0.3
-    end
-    GryllsExpBar.border:SetBackdropBorderColor(r, g, b, 1)
-
-    if GryllsExpBar_Settings.barBorder then
-        GryllsExpBar.border:Show()
-    else
-        GryllsExpBar.border:Hide()
-    end
-end
-
-local function setBar()
-    GryllsExpBar.backgroundBar:SetWidth(GryllsExpBar_Settings.barWidth)
-    GryllsExpBar.backgroundBar:SetHeight(GryllsExpBar_Settings.barHeight)
-    GryllsExpBar.backgroundBar:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", GryllsExpBar_Settings.barLeft, GryllsExpBar_Settings.barTop)
-    GryllsExpBar.string:SetWidth(GryllsExpBar_Settings.barWidth)
-    GryllsExpBar.string.expText:SetWidth(GryllsExpBar.string:GetWidth())
-    GryllsExpBar.string.repText:SetWidth(GryllsExpBar.string:GetWidth())
-    barBorder()
-end
-
-local function resetBar()
-    GryllsExpBar_Settings.barWidth = 465
-    GryllsExpBar_Settings.barHeight = 18
-    GryllsExpBar_Settings.barLeft = 1075
-    GryllsExpBar_Settings.barTop = 200
-    GryllsExpBar_Settings.barBorder = true
-    GryllsExpBar_Settings.darkTheme = false
-    GryllsExpBar_Settings.classColor = false
-    setBar()
 end
 
 local function GryllsExpBar_commands(msg, editbox)
@@ -328,9 +361,11 @@ end
 
 GryllsExpBar:RegisterEvent("ADDON_LOADED")
 GryllsExpBar:RegisterEvent("PLAYER_ENTERING_WORLD")
+GryllsExpBar:RegisterEvent("PLAYER_UPDATE_RESTING")
 GryllsExpBar:RegisterEvent("PLAYER_XP_UPDATE")
 GryllsExpBar:RegisterEvent("UPDATE_EXHAUSTION")
 GryllsExpBar:RegisterEvent("UPDATE_FACTION")
+
 GryllsExpBar:SetScript("OnEvent", function()
 	if event == "ADDON_LOADED" then
 		if not GryllsExpBar.loaded then
@@ -343,12 +378,16 @@ GryllsExpBar:SetScript("OnEvent", function()
             GryllsExpBar.move = false
             GryllsExpBar.loaded = true
 		end
+    elseif event == "PLAYER_UPDATE_RESTING" then
+        updateResting()
     elseif event == "PLAYER_ENTERING_WORLD" then
         updateExp()
         updateRep()
+        updateResting()
     elseif event == "PLAYER_XP_UPDATE" or event == "UPDATE_EXHAUSTION" then
         updateExp()
     elseif event == "UPDATE_FACTION" then
         updateRep()
+        updateResting()
     end
 end)
