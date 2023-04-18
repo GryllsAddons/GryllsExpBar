@@ -76,7 +76,8 @@ local function updateExp()
     if mouseover then
         GryllsExpBar.string.expText:SetText(ExpText(xp, xpmax, exh, xp_perc, remaining, remaining_perc, playerlevel))
     else
-        GryllsExpBar.string.expText:SetText(exh .. " (" .. xp_perc .. "%) rested")
+        local exh_perc = roundnum(exh / xpmax * 100) or 0
+        GryllsExpBar.string.expText:SetText(exh .. " (" .. exh_perc .. "%) rested")
     end
 end
 
