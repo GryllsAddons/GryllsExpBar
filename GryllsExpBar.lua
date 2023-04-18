@@ -1,6 +1,7 @@
 -- GryllsExpBar
 local GryllsExpBar = CreateFrame("Frame", nil, UIParent)
 local mouseover
+local turtle = (TargetHPText or TargetHPPercText)  -- Turtle WoW
 
 GryllsExpBar_Settings = {
     barWidth = 465,
@@ -128,10 +129,9 @@ local function updateResting()
         if IsResting() then
             updateExp()
             GryllsExpBar.string.expText:Show()
-        else
-            -- Always show rested % for Turtle WoW
-            if (TargetHPText or TargetHPPercText) then
-                GryllsExpBar.string.expText:Show()
+        else            
+            if turtle then
+                GryllsExpBar.string.expText:Show() -- always show rested %
             else
                 GryllsExpBar.string.expText:Hide()
             end
