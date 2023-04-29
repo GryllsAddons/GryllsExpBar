@@ -1,7 +1,7 @@
 -- GryllsExpBar
 local GryllsExpBar = CreateFrame("Frame", nil, UIParent)
 local mouseover
-local turtle = (TargetHPText or TargetHPPercText)  -- Turtle WoW
+-- local turtle = (TargetHPText or TargetHPPercText)  -- Turtle WoW
 
 GryllsExpBar_Settings = {
     barWidth = 465,
@@ -26,10 +26,9 @@ end
 local function updateExp()
     local playerlevel = UnitLevel("player")
     -- credit to Shagu (https://shagu.org/pfUI/) for code below
-    local function ExpText(xp, xpmax, exh, xp_perc, remaining, remaining_perc, playerlevel)
+    local function ExpText(xp, xpmax, exh, xp_perc, exh_perc, remaining, remaining_perc, playerlevel)
         if playerlevel < 60 then
             if exh ~= 0 then
-                local exh_perc = roundnum(exh / xpmax * 100) or 0
                 return "Level "..playerlevel.." - "..remaining.." ("..remaining_perc.."%) remaining - "..exh.." ("..exh_perc.."%) rested"
             else
                 return "Level "..playerlevel.." - "..remaining.." ("..remaining_perc.."%) remaining"
@@ -39,6 +38,7 @@ local function updateExp()
 
     local xp, xpmax, exh = UnitXP("player"), UnitXPMax("player"), GetXPExhaustion() or 0
     local xp_perc = roundnum(xp / xpmax * 100)
+    local exh_perc = roundnum(exh / xpmax * 100) or 0
     local remaining = xpmax - xp
     local remaining_perc = roundnum(remaining / xpmax * 100)
 
@@ -62,21 +62,30 @@ local function updateExp()
         local color = RAID_CLASS_COLORS[class]
         r,g,b = color.r, color.g, color.b
     else
-        if exh > 0 then -- if rested
-            r,g,b = 0, 0.5, 1
-        else
-            r,g,b = 0.6, 0, 0.6
+        local rested = GetRestState()
+        if (rested == 1) then
+            if (exh_perc == 150) then
+                r,g,b = 0, 1, 0.6
+            else
+                r,g,b = 0.0, 0.39, 0.88
+            end
+		elseif (rested == 2) then
+            r,g,b = 0.58, 0.0, 0.55
         end
     end
 
     GryllsExpBar.expBar:SetStatusBarColor(r,g,b,1)
-    GryllsExpBar.restedBar:SetStatusBarColor(0, 0.5, 1, 0.5)
+    if exh_perc == 150 then
+        GryllsExpBar.restedBar:SetStatusBarColor(r,g,b,0.5)
+    else
+        GryllsExpBar.restedBar:SetStatusBarColor(0, 0.5, 1, 0.5)
+    end
+    
 
     -- set exp text
     if mouseover then
-        GryllsExpBar.string.expText:SetText(ExpText(xp, xpmax, exh, xp_perc, remaining, remaining_perc, playerlevel))
+        GryllsExpBar.string.expText:SetText(ExpText(xp, xpmax, exh, xp_perc, exh_perc, remaining, remaining_perc, playerlevel))
     else
-        local exh_perc = roundnum(exh / xpmax * 100) or 0
         GryllsExpBar.string.expText:SetText(exh .. " (" .. exh_perc .. "%) rested")
     end
 end
@@ -131,11 +140,11 @@ local function updateResting()
             updateExp()
             GryllsExpBar.string.expText:Show()
         else            
-            if turtle then
-                GryllsExpBar.string.expText:Show() -- always show rested %
-            else
+            -- if turtle then
+            --     GryllsExpBar.string.expText:Show() -- always show rested %
+            -- else
                 GryllsExpBar.string.expText:Hide()
-            end
+            -- end
         end
     end
 end
@@ -267,7 +276,7 @@ local function createBar()
         mouseover = nil
         updateExp()
         GryllsExpBar.string.repText:Hide()
-        -- GryllsExpBar.string.expText:Hide()
+        GryllsExpBar.string.expText:Hide()
     end)
 
     GryllsExpBar.mouse:SetScript("OnDragStart", function()
